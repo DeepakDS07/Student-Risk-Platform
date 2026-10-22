@@ -22,11 +22,11 @@ router.post(
 );
 
 // @route   POST /api/risk/batch-compute
-// @access  Admin-only
+// @access  Faculty / Admin
 router.post(
   '/batch-compute',
   authMiddleware,
-  roleMiddleware('admin'),
+  roleMiddleware('faculty', 'admin'),
   batchComputeRisk
 );
 

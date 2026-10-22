@@ -7,7 +7,8 @@ const {
   getEngagementStats,
   getEngagementById,
   updateEngagement,
-  deleteEngagement
+  deleteEngagement,
+  bulkCreateEngagement
 } = require('../controllers/engagementController');
 
 const authMiddleware = require('../middleware/authMiddleware');
@@ -27,6 +28,15 @@ router.post(
   validateCreateEngagement,
   handleDataValidationErrors,
   createOrUpdateEngagement
+);
+
+// @route   POST /api/engagement/bulk
+// @access  Faculty / Admin
+router.post(
+  '/bulk',
+  authMiddleware,
+  roleMiddleware('faculty', 'admin'),
+  bulkCreateEngagement
 );
 
 // @route   GET /api/engagement/student/:studentId

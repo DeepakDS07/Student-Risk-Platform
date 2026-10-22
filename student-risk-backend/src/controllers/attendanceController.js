@@ -267,20 +267,40 @@ const bulkCreateAttendance = async (req, res, next) => {
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       try {
-        const student = await Student.findById(item.studentId);
+        let student = null;
+        if (item.rollNumber) {
+          student = await Student.findOne({ rollNumber: item.rollNumber.trim() });
+        } else if (item.studentId) {
+          student = await Student.findById(item.studentId);
+        }
+
         if (!student) {
           failed++;
-          errors.push({ index: i, message: `Student ${item.studentId} not found` });
+          errors.push({ index: i, message: `Student ${item.rollNumber || item.studentId} not found` });
           continue;
         }
 
-        await Attendance.create({
-          studentId: item.studentId,
+        const dateObj = new Date(item.date);
+        // Upsert or create attendance record
+        const existing = await Attendance.findOne({
+          studentId: student._id,
           subject: item.subject,
-          date: new Date(item.date),
-          status: item.status,
-          recordedBy: req.user._id
+          date: dateObj
         });
+
+        if (existing) {
+          existing.status = item.status.toLowerCase();
+          existing.recordedBy = req.user._id;
+          await existing.save();
+        } else {
+          await Attendance.create({
+            studentId: student._id,
+            subject: item.subject,
+            date: dateObj,
+            status: item.status.toLowerCase(),
+            recordedBy: req.user._id
+          });
+        }
         created++;
       } catch (err) {
         failed++;

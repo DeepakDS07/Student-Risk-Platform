@@ -6,8 +6,9 @@ import RiskBadge from '../components/RiskBadge';
 import ErrorAlert from '../components/ErrorAlert';
 import SuccessToast from '../components/SuccessToast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import BatchCsvModal from '../components/BatchCsvModal';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { BookOpen, Users, PlusCircle, ArrowRight, Filter, AlertTriangle, Search, Download, FileSpreadsheet } from 'lucide-react';
+import { BookOpen, Users, PlusCircle, ArrowRight, Filter, AlertTriangle, Search, Download, FileSpreadsheet, Upload } from 'lucide-react';
 
 const COLORS = {
   high: '#ef4444',
@@ -46,10 +47,11 @@ const FacultyDashboard = () => {
   const [avgSubmissionDelay, setAvgSubmissionDelay] = useState('2');
   const [participationScore, setParticipationScore] = useState('80');
 
-  // UI Notifications
+  // UI Notifications & Modals
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCsvModalOpen, setIsCsvModalOpen] = useState(false);
 
   // Fetch Students & Risk Summary
   const fetchData = async () => {
@@ -246,9 +248,19 @@ const FacultyDashboard = () => {
 
           {/* Quick Data Upload Section */}
           <div className="lg:col-span-2 bg-slate-800 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
-            <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-700/60">
-              <PlusCircle className="w-5 h-5 text-teal-400" />
-              <h2 className="text-lg font-bold text-slate-100">Quick Data Ingestion</h2>
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-700/60">
+              <div className="flex items-center gap-2.5">
+                <PlusCircle className="w-5 h-5 text-teal-400" />
+                <h2 className="text-lg font-bold text-slate-100">Quick Data Ingestion</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCsvModalOpen(true)}
+                className="px-3 py-1.5 bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 text-xs font-semibold rounded-lg border border-teal-500/30 flex items-center gap-1.5 transition-all shadow-sm"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                Batch CSV Import
+              </button>
             </div>
 
             <div className="flex gap-2 mb-5">
@@ -530,6 +542,17 @@ const FacultyDashboard = () => {
             </div>
           )}
         </div>
+
+        {/* Batch CSV Modal */}
+        <BatchCsvModal
+          isOpen={isCsvModalOpen}
+          onClose={() => setIsCsvModalOpen(false)}
+          currentDepartment={selectedClass}
+          onSuccess={(msg) => {
+            setSuccess(msg);
+            fetchData();
+          }}
+        />
       </main>
     </div>
   );

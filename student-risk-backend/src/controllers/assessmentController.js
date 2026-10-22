@@ -290,10 +290,16 @@ const bulkCreateAssessment = async (req, res, next) => {
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       try {
-        const student = await Student.findById(item.studentId);
+        let student = null;
+        if (item.rollNumber) {
+          student = await Student.findOne({ rollNumber: item.rollNumber.trim() });
+        } else if (item.studentId) {
+          student = await Student.findById(item.studentId);
+        }
+
         if (!student) {
           failed++;
-          errors.push({ index: i, message: `Student ${item.studentId} not found` });
+          errors.push({ index: i, message: `Student ${item.rollNumber || item.studentId} not found` });
           continue;
         }
 
@@ -304,9 +310,9 @@ const bulkCreateAssessment = async (req, res, next) => {
         }
 
         await Assessment.create({
-          studentId: item.studentId,
+          studentId: student._id,
           subject: item.subject,
-          type: item.type,
+          type: item.type ? item.type.toLowerCase() : 'internal',
           marksObtained: Number(item.marksObtained),
           maxMarks: Number(item.maxMarks),
           date: new Date(item.date),

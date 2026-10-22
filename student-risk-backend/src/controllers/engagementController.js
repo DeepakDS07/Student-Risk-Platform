@@ -286,11 +286,73 @@ const deleteEngagement = async (req, res, next) => {
   }
 };
 
+// @desc    Bulk create or update engagement records
+// @route   POST /api/engagement/bulk
+// @access  Faculty / Admin
+const bulkCreateEngagement = async (req, res, next) => {
+  try {
+    const items = Array.isArray(req.body) ? req.body : req.body.records || [];
+    let created = 0;
+    let failed = 0;
+    const errors = [];
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      try {
+        let student = null;
+        if (item.rollNumber) {
+          student = await Student.findOne({ rollNumber: item.rollNumber.trim() });
+        } else if (item.studentId) {
+          student = await Student.findById(item.studentId);
+        }
+
+        if (!student) {
+          failed++;
+          errors.push({ index: i, message: `Student ${item.rollNumber || item.studentId} not found` });
+          continue;
+        }
+
+        const existing = await Engagement.findOne({ studentId: student._id, period: item.period });
+        if (existing) {
+          if (item.loginCount !== undefined) existing.loginCount = Number(item.loginCount);
+          if (item.avgSubmissionDelayHours !== undefined)
+            existing.avgSubmissionDelayHours = Number(item.avgSubmissionDelayHours);
+          if (item.participationScore !== undefined)
+            existing.participationScore = Number(item.participationScore);
+          await existing.save();
+        } else {
+          await Engagement.create({
+            studentId: student._id,
+            period: item.period,
+            loginCount: item.loginCount !== undefined ? Number(item.loginCount) : 0,
+            avgSubmissionDelayHours:
+              item.avgSubmissionDelayHours !== undefined ? Number(item.avgSubmissionDelayHours) : 0,
+            participationScore:
+              item.participationScore !== undefined ? Number(item.participationScore) : 0
+          });
+        }
+        created++;
+      } catch (err) {
+        failed++;
+        errors.push({ index: i, message: err.message });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: { created, failed, errors }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createOrUpdateEngagement,
   getEngagementByStudent,
   getEngagementStats,
   getEngagementById,
   updateEngagement,
-  deleteEngagement
+  deleteEngagement,
+  bulkCreateEngagement
 };
