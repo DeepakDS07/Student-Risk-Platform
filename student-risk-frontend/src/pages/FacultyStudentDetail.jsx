@@ -233,6 +233,84 @@ const FacultyStudentDetail = () => {
               )}
             </div>
 
+            {/* Test-Type Specific Assessment Breakdown (UT-1, UT-2, CAT-1, CAT-2, Semester) */}
+            <div className="bg-slate-800 border border-slate-700/80 rounded-2xl p-6 shadow-xl mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-indigo-400" />
+                  <h2 className="text-lg font-bold text-slate-100">Assessment Test Breakdown</h2>
+                </div>
+                <span className="text-xs text-slate-400">Total Logged Tests: {assessmentStats?.totalAssessments || assessmentsList.length}</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 mb-5">
+                {[
+                  { key: 'ut1', label: 'Unit Test 1', badge: 'UT-1', color: 'border-cyan-500/30 bg-cyan-500/5 text-cyan-400' },
+                  { key: 'ut2', label: 'Unit Test 2', badge: 'UT-2', color: 'border-blue-500/30 bg-blue-500/5 text-blue-400' },
+                  { key: 'cat1', label: 'CAT 1', badge: 'CAT-1', color: 'border-violet-500/30 bg-violet-500/5 text-violet-400' },
+                  { key: 'cat2', label: 'CAT 2', badge: 'CAT-2', color: 'border-indigo-500/30 bg-indigo-500/5 text-indigo-400' },
+                  { key: 'semester', label: 'Semester Exam', badge: 'SEM', color: 'border-teal-500/30 bg-teal-500/5 text-teal-400' }
+                ].map((test) => {
+                  const stats = assessmentStats?.byType?.[test.key];
+                  const hasData = stats && stats.count > 0;
+                  return (
+                    <div key={test.key} className={`border rounded-xl p-3.5 flex flex-col justify-between ${test.color}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] uppercase font-bold tracking-wider">{test.badge}</span>
+                        <span className="text-[10px] text-slate-400 font-semibold">{hasData ? `${stats.count} record(s)` : 'No records'}</span>
+                      </div>
+                      <div>
+                        <span className="text-2xl font-black text-slate-100">
+                          {hasData ? `${stats.average}%` : '—'}
+                        </span>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{test.label}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Assessment Records Sub-table */}
+              {assessmentsList.length > 0 && (
+                <div className="overflow-x-auto border border-slate-700/60 rounded-xl">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead className="bg-slate-900/60 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60">
+                      <tr>
+                        <th className="py-2.5 px-3.5">Subject</th>
+                        <th className="py-2.5 px-3.5">Test Type</th>
+                        <th className="py-2.5 px-3.5">Marks Obtained</th>
+                        <th className="py-2.5 px-3.5">Percentage</th>
+                        <th className="py-2.5 px-3.5">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-700/40 text-slate-200">
+                      {assessmentsList.slice(0, 8).map((a, i) => {
+                        const pct = Number(((a.marksObtained / a.maxMarks) * 100).toFixed(1));
+                        const typeUpper = (a.type || 'internal').toUpperCase();
+                        return (
+                          <tr key={i} className="hover:bg-slate-700/20">
+                            <td className="py-2.5 px-3.5 font-semibold text-slate-100">{a.subject}</td>
+                            <td className="py-2.5 px-3.5">
+                              <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-mono text-[11px] font-bold">
+                                {typeUpper}
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-3.5 font-mono">{a.marksObtained} / {a.maxMarks}</td>
+                            <td className="py-2.5 px-3.5 font-bold font-mono">
+                              <span className={pct >= 75 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-rose-400'}>
+                                {pct}%
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-3.5 text-slate-400">{new Date(a.date).toLocaleDateString()}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
             {/* 3 Analytics Summary Widgets */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               {/* Attendance Widget */}

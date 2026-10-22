@@ -93,11 +93,11 @@ const USERS_SEED = [
     // attendance: 90%, marks: 85%, engagement: high → LOW risk
     attendanceProfile: { presentDays: 27, lateDays: 0, absentDays: 3 },
     marksProfile: [
-      { type: 'internal', marks: 43, max: 50 },
-      { type: 'internal', marks: 45, max: 50 },
-      { type: 'assignment', marks: 18, max: 20 },
-      { type: 'assignment', marks: 19, max: 20 },
-      { type: 'semester', marks: 82, max: 100 }
+      { type: 'ut1', marks: 23, max: 25 },
+      { type: 'ut2', marks: 24, max: 25 },
+      { type: 'cat1', marks: 45, max: 50 },
+      { type: 'cat2', marks: 44, max: 50 },
+      { type: 'semester', marks: 86, max: 100 }
     ],
     engagementProfile: [
       { monthsAgo: 2, logins: 28, delay: 1.2, participation: 80 },
@@ -121,11 +121,11 @@ const USERS_SEED = [
     // attendance: 70%, marks: 60%, engagement: moderate → MEDIUM risk
     attendanceProfile: { presentDays: 21, lateDays: 0, absentDays: 9 },
     marksProfile: [
-      { type: 'internal', marks: 30, max: 50 },
-      { type: 'internal', marks: 28, max: 50 },
-      { type: 'assignment', marks: 12, max: 20 },
-      { type: 'assignment', marks: 14, max: 20 },
-      { type: 'semester', marks: 55, max: 100 }
+      { type: 'ut1', marks: 16, max: 25 },
+      { type: 'ut2', marks: 15, max: 25 },
+      { type: 'cat1', marks: 31, max: 50 },
+      { type: 'cat2', marks: 29, max: 50 },
+      { type: 'semester', marks: 58, max: 100 }
     ],
     engagementProfile: [
       { monthsAgo: 2, logins: 14, delay: 8.5, participation: 45 },
@@ -149,11 +149,11 @@ const USERS_SEED = [
     // attendance: 50%, marks: 35%, engagement: low → HIGH risk
     attendanceProfile: { presentDays: 15, lateDays: 0, absentDays: 15 },
     marksProfile: [
-      { type: 'internal', marks: 18, max: 50 },
-      { type: 'internal', marks: 15, max: 50 },
-      { type: 'assignment', marks: 7, max: 20 },
-      { type: 'assignment', marks: 6, max: 20 },
-      { type: 'semester', marks: 30, max: 100 }
+      { type: 'ut1', marks: 9, max: 25 },
+      { type: 'ut2', marks: 8, max: 25 },
+      { type: 'cat1', marks: 17, max: 50 },
+      { type: 'cat2', marks: 16, max: 50 },
+      { type: 'semester', marks: 32, max: 100 }
     ],
     engagementProfile: [
       { monthsAgo: 2, logins: 5, delay: 24.0, participation: 15 },
