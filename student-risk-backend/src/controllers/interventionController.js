@@ -6,7 +6,7 @@ const Student = require('../models/Student');
 // @access  Mentor / Admin / Faculty
 const createIntervention = async (req, res, next) => {
   try {
-    const { studentId, action, notes, status } = req.body;
+    const { studentId, action, category, followUpDate, outcome, notes, status } = req.body;
 
     if (!studentId || !action) {
       return res.status(400).json({
@@ -27,6 +27,9 @@ const createIntervention = async (req, res, next) => {
       studentId,
       mentorId: req.user._id,
       action,
+      category: category || 'academic',
+      followUpDate: followUpDate ? new Date(followUpDate) : undefined,
+      outcome: outcome || '',
       notes: notes || '',
       status: status || 'open'
     });
@@ -81,13 +84,13 @@ const getStudentInterventions = async (req, res, next) => {
   }
 };
 
-// @desc    Update intervention status or notes
+// @desc    Update intervention status, outcome, or notes
 // @route   PUT /api/interventions/:id
 // @access  Mentor / Admin / Faculty
 const updateIntervention = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { action, status, notes } = req.body;
+    const { action, category, status, outcome, followUpDate, notes } = req.body;
 
     const intervention = await Intervention.findById(id);
     if (!intervention) {
@@ -98,7 +101,10 @@ const updateIntervention = async (req, res, next) => {
     }
 
     if (action) intervention.action = action;
+    if (category) intervention.category = category;
     if (status) intervention.status = status;
+    if (outcome !== undefined) intervention.outcome = outcome;
+    if (followUpDate !== undefined) intervention.followUpDate = followUpDate ? new Date(followUpDate) : undefined;
     if (notes !== undefined) intervention.notes = notes;
 
     await intervention.save();

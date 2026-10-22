@@ -46,6 +46,9 @@ const MentorDashboard = () => {
   // Intervention Form State
   const [selectedStudentId, setSelectedStudentId] = useState('');
   const [actionInput, setActionInput] = useState('');
+  const [categoryInput, setCategoryInput] = useState('academic');
+  const [followUpDateInput, setFollowUpDateInput] = useState('');
+  const [outcomeInput, setOutcomeInput] = useState('');
   const [statusInput, setStatusInput] = useState('open');
   const [notesInput, setNotesInput] = useState('');
 
@@ -152,6 +155,9 @@ const MentorDashboard = () => {
       const res = await axiosInstance.post('/interventions', {
         studentId: selectedStudentId,
         action: actionInput,
+        category: categoryInput,
+        followUpDate: followUpDateInput || undefined,
+        outcome: outcomeInput || undefined,
         status: statusInput,
         notes: notesInput
       });
@@ -159,6 +165,9 @@ const MentorDashboard = () => {
       if (res.data && res.data.success) {
         setSuccess('Intervention logged successfully!');
         setActionInput('');
+        setCategoryInput('academic');
+        setFollowUpDateInput('');
+        setOutcomeInput('');
         setNotesInput('');
         setStatusInput('open');
         fetchMentorData();
@@ -514,35 +523,77 @@ const MentorDashboard = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Intervention Action</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1">Intervention Category</label>
+                <select
+                  value={categoryInput}
+                  onChange={(e) => setCategoryInput(e.target.value)}
+                  className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 text-xs focus:outline-none focus:border-teal-500 capitalize"
+                >
+                  <option value="academic">Academic Counseling</option>
+                  <option value="attendance">Attendance Warning & Support</option>
+                  <option value="psychological">Wellness & Stress Counseling</option>
+                  <option value="career">Career & Skill Mentoring</option>
+                  <option value="general">General Check-in</option>
+                </select>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-medium text-slate-300">Action Plan / Meeting Notes</label>
+                  <span className="text-[10px] text-teal-400 cursor-pointer hover:underline" onClick={() => setActionInput('Conducted 1-on-1 performance review. Assigned peer study partner.')}>
+                    Use Template
+                  </span>
+                </div>
                 <textarea
                   required
                   rows={3}
-                  placeholder="e.g. Conducted 1-on-1 counseling session regarding attendance..."
+                  placeholder="e.g. Conducted 1-on-1 counseling session regarding attendance. Recommended remedial classes..."
                   value={actionInput}
                   onChange={(e) => setActionInput(e.target.value)}
                   className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-teal-500"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Initial Status</label>
-                <select
-                  value={statusInput}
-                  onChange={(e) => setStatusInput(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 text-xs focus:outline-none focus:border-teal-500"
-                >
-                  <option value="open">Open (Action Needed)</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="resolved">Resolved</option>
-                </select>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Status</label>
+                  <select
+                    value={statusInput}
+                    onChange={(e) => setStatusInput(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 text-xs focus:outline-none focus:border-teal-500"
+                  >
+                    <option value="open">Open (Active)</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Follow-up Date</label>
+                  <input
+                    type="date"
+                    value={followUpDateInput}
+                    onChange={(e) => setFollowUpDateInput(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 text-xs focus:outline-none focus:border-teal-500"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Additional Notes (Optional)</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1">Outcome / Milestones (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Target 80% attendance in next 2 weeks"
+                  value={outcomeInput}
+                  onChange={(e) => setOutcomeInput(e.target.value)}
+                  className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-teal-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-1">Private Mentor Notes (Optional)</label>
                 <textarea
                   rows={2}
-                  placeholder="Follow-up scheduled next Tuesday..."
+                  placeholder="Follow-up scheduled with course coordinator..."
                   value={notesInput}
                   onChange={(e) => setNotesInput(e.target.value)}
                   className="w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-teal-500"
@@ -583,8 +634,10 @@ const MentorDashboard = () => {
                   <thead>
                     <tr className="border-b border-slate-700/80 text-xs font-semibold text-slate-400 uppercase tracking-wider">
                       <th className="py-3 px-3">Student</th>
-                      <th className="py-3 px-3">Action Description</th>
+                      <th className="py-3 px-3">Category</th>
+                      <th className="py-3 px-3">Action & Milestone</th>
                       <th className="py-3 px-3">Status</th>
+                      <th className="py-3 px-3">Follow-up</th>
                       <th className="py-3 px-3 text-right">Update Status</th>
                     </tr>
                   </thead>
@@ -598,7 +651,15 @@ const MentorDashboard = () => {
                           <div className="text-xs text-slate-400">{item.studentId?.rollNumber}</div>
                         </td>
                         <td className="py-3 px-3">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+                            {item.category || 'Academic'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3">
                           <div className="text-xs font-medium text-slate-200">{item.action}</div>
+                          {item.outcome && (
+                            <div className="text-[11px] text-teal-400 mt-0.5">🎯 {item.outcome}</div>
+                          )}
                           {item.notes && <div className="text-[11px] text-slate-400 italic mt-0.5">{item.notes}</div>}
                         </td>
                         <td className="py-3 px-3">
@@ -613,6 +674,9 @@ const MentorDashboard = () => {
                           >
                             {item.status}
                           </span>
+                        </td>
+                        <td className="py-3 px-3 text-xs text-slate-400">
+                          {item.followUpDate ? new Date(item.followUpDate).toLocaleDateString() : '—'}
                         </td>
                         <td className="py-3 px-3 text-right">
                           <select

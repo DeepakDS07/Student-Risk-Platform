@@ -18,6 +18,21 @@ const interventionSchema = new mongoose.Schema(
       required: [true, 'Action is required'],
       trim: true
     },
+    category: {
+      type: String,
+      enum: {
+        values: ['academic', 'attendance', 'psychological', 'career', 'general'],
+        message: 'Category must be academic, attendance, psychological, career, or general'
+      },
+      default: 'academic'
+    },
+    followUpDate: {
+      type: Date
+    },
+    outcome: {
+      type: String,
+      trim: true
+    },
     notes: {
       type: String,
       trim: true

@@ -36,6 +36,10 @@ const FacultyDashboard = () => {
   const [dateInput, setDateInput] = useState(new Date().toISOString().substring(0, 10));
   const [statusInput, setStatusInput] = useState('present');
 
+  // Multi-Student Roster Attendance State
+  const [attendanceMode, setAttendanceMode] = useState('single'); // 'single' or 'class_roster'
+  const [rosterStatuses, setRosterStatuses] = useState({});
+
   // Assessment upload fields
   const [assessmentType, setAssessmentType] = useState('internal');
   const [marksObtained, setMarksObtained] = useState('');
@@ -86,6 +90,35 @@ const FacultyDashboard = () => {
 
   const handleDataUpload = async (e) => {
     e.preventDefault();
+
+    if (uploadType === 'attendance' && attendanceMode === 'class_roster') {
+      if (studentsList.length === 0) {
+        setError('No students found in this class.');
+        return;
+      }
+      setError('');
+      setSuccess('');
+      setIsSubmitting(true);
+      try {
+        const records = studentsList.map((s) => ({
+          studentId: s._id,
+          subject: subjectInput,
+          date: dateInput,
+          status: rosterStatuses[s._id] || 'present'
+        }));
+        const res = await axiosInstance.post('/attendance/bulk', records);
+        if (res.data.success) {
+          setSuccess(`Class attendance logged successfully for ${res.data.data.created} students!`);
+          fetchData();
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || err.message || 'Failed to submit class attendance');
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
     if (!selectedStudentId) {
       setError('Please select a target student');
       return;
@@ -280,20 +313,53 @@ const FacultyDashboard = () => {
             </div>
 
             <form onSubmit={handleDataUpload} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Target Student</label>
-                <select
-                  value={selectedStudentId}
-                  onChange={(e) => setSelectedStudentId(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 text-xs focus:outline-none focus:border-teal-500"
-                >
-                  {studentsList.map((s) => (
-                    <option key={s._id} value={s._id}>
-                      {s.userId?.name || 'Student'} ({s.rollNumber})
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Attendance Mode Selector */}
+              {uploadType === 'attendance' && (
+                <div className="sm:col-span-2 flex items-center justify-between p-2.5 bg-slate-900/60 rounded-xl border border-slate-700/60 mb-1">
+                  <span className="text-xs font-semibold text-slate-300">Attendance Ingestion Mode:</span>
+                  <div className="flex gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setAttendanceMode('single')}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        attendanceMode === 'single'
+                          ? 'bg-teal-600 text-white'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      Single Student
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAttendanceMode('class_roster')}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        attendanceMode === 'class_roster'
+                          ? 'bg-teal-600 text-white'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      Whole Class Roster ({studentsList.length})
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {uploadType !== 'attendance' || attendanceMode === 'single' ? (
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Target Student</label>
+                  <select
+                    value={selectedStudentId}
+                    onChange={(e) => setSelectedStudentId(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 text-xs focus:outline-none focus:border-teal-500"
+                  >
+                    {studentsList.map((s) => (
+                      <option key={s._id} value={s._id}>
+                        {s.userId?.name || 'Student'} ({s.rollNumber})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
 
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1">Subject</label>
@@ -319,18 +385,66 @@ const FacultyDashboard = () => {
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 text-xs focus:outline-none focus:border-teal-500"
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Status</label>
-                    <select
-                      value={statusInput}
-                      onChange={(e) => setStatusInput(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 text-xs focus:outline-none focus:border-teal-500"
-                    >
-                      <option value="present">Present</option>
-                      <option value="absent">Absent</option>
-                      <option value="late">Late</option>
-                    </select>
-                  </div>
+
+                  {attendanceMode === 'single' ? (
+                    <div>
+                      <label className="block text-xs font-medium text-slate-300 mb-1">Status</label>
+                      <select
+                        value={statusInput}
+                        onChange={(e) => setStatusInput(e.target.value)}
+                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 text-xs focus:outline-none focus:border-teal-500"
+                      >
+                        <option value="present">Present</option>
+                        <option value="absent">Absent</option>
+                        <option value="late">Late</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="sm:col-span-2 border border-slate-700/80 rounded-xl p-3 bg-slate-900/40">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-slate-200">Mark Class Roll Call</span>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const allP = {};
+                              studentsList.forEach(s => { allP[s._id] = 'present'; });
+                              setRosterStatuses(allP);
+                            }}
+                            className="text-[11px] text-teal-400 hover:underline"
+                          >
+                            Mark All Present
+                          </button>
+                        </div>
+                      </div>
+                      <div className="max-h-48 overflow-y-auto space-y-2 pr-1">
+                        {studentsList.map((s) => {
+                          const currentStat = rosterStatuses[s._id] || 'present';
+                          return (
+                            <div key={s._id} className="flex items-center justify-between bg-slate-800 p-2 rounded-lg text-xs">
+                              <span className="font-semibold text-slate-200">{s.userId?.name || 'Student'} <span className="font-mono text-slate-400 font-normal">({s.rollNumber})</span></span>
+                              <div className="flex gap-1">
+                                {['present', 'absent', 'late'].map((st) => (
+                                  <button
+                                    key={st}
+                                    type="button"
+                                    onClick={() => setRosterStatuses(prev => ({ ...prev, [s._id]: st }))}
+                                    className={`px-2 py-0.5 rounded text-[11px] font-bold capitalize transition-all ${
+                                      currentStat === st
+                                        ? st === 'present' ? 'bg-emerald-600 text-white' : st === 'absent' ? 'bg-rose-600 text-white' : 'bg-amber-600 text-white'
+                                        : 'bg-slate-900 text-slate-400 hover:text-slate-200'
+                                    }`}
+                                  >
+                                    {st}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
 
