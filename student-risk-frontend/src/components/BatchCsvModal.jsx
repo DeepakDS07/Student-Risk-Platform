@@ -19,10 +19,12 @@ CS2024003,Mathematics,2026-10-22,late`,
     filename: 'assessment_template.csv',
     headers: 'RollNumber,Subject,Type,MarksObtained,MaxMarks,Date',
     sample: `RollNumber,Subject,Type,MarksObtained,MaxMarks,Date
-CS2024001,Mathematics,internal,45,50,2026-10-20
-CS2024002,Mathematics,internal,32,50,2026-10-20
-CS2024003,Mathematics,internal,18,50,2026-10-20`,
-    description: 'Bulk log exam or assignment marks. Type must be: internal, assignment, or semester.'
+CS2024001,Mathematics,ut1,23,25,2026-10-05
+CS2024001,Mathematics,ut2,21,25,2026-10-18
+CS2024001,Mathematics,cat1,44,50,2026-10-12
+CS2024001,Mathematics,cat2,46,50,2026-10-25
+CS2024001,Mathematics,semester,82,100,2026-10-30`,
+    description: 'Bulk log tests: ut1, ut2, cat1, cat2, or semester exam marks.'
   },
   engagement: {
     filename: 'engagement_template.csv',

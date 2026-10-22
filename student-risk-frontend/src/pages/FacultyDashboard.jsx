@@ -342,11 +342,14 @@ const FacultyDashboard = () => {
                     <select
                       value={assessmentType}
                       onChange={(e) => setAssessmentType(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 text-xs focus:outline-none focus:border-teal-500"
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 text-xs focus:outline-none focus:border-teal-500 font-medium"
                     >
-                      <option value="internal">Internal Exam</option>
-                      <option value="assignment">Assignment</option>
+                      <option value="ut1">Unit Test 1 (UT-1)</option>
+                      <option value="ut2">Unit Test 2 (UT-2)</option>
+                      <option value="cat1">Continuous Assessment Test 1 (CAT-1)</option>
+                      <option value="cat2">Continuous Assessment Test 2 (CAT-2)</option>
                       <option value="semester">Semester Exam</option>
+                      <option value="internal">Internal / Assignment</option>
                     </select>
                   </div>
                   <div>

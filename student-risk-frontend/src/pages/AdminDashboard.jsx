@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import ErrorAlert from '../components/ErrorAlert';
 import SuccessToast from '../components/SuccessToast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import BatchCsvModal from '../components/BatchCsvModal';
 import {
   UserPlus,
   Users,
@@ -16,7 +17,8 @@ import {
   Search,
   Download,
   Filter,
-  UserCheck
+  UserCheck,
+  Upload
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -45,6 +47,7 @@ const AdminDashboard = () => {
   const [lowThreshold, setLowThreshold] = useState(30);
   const [medThreshold, setMedThreshold] = useState(60);
   const [settingsSaved, setSettingsSaved] = useState(false);
+  const [isCsvModalOpen, setIsCsvModalOpen] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -200,6 +203,14 @@ const AdminDashboard = () => {
             <h1 className="text-2xl font-bold text-slate-100">Admin Control Center</h1>
             <p className="text-sm text-slate-400">Manage user accounts, assign mentors, and configure system thresholds</p>
           </div>
+          <button
+            type="button"
+            onClick={() => setIsCsvModalOpen(true)}
+            className="self-start md:self-auto px-4 py-2.5 bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 text-xs font-semibold rounded-xl border border-teal-500/30 flex items-center gap-2 transition-all shadow-sm"
+          >
+            <Upload className="w-4 h-4 text-teal-400" />
+            Batch CSV Import
+          </button>
         </div>
 
         <ErrorAlert message={error} onClose={() => setError('')} />
@@ -600,6 +611,17 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
+
+        {/* Batch CSV Modal */}
+        <BatchCsvModal
+          isOpen={isCsvModalOpen}
+          onClose={() => setIsCsvModalOpen(false)}
+          currentDepartment="all"
+          onSuccess={(msg) => {
+            setSuccess(msg);
+            fetchData();
+          }}
+        />
       </main>
     </div>
   );

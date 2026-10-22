@@ -39,8 +39,8 @@ const validateCreateAssessment = [
   body('subject').trim().notEmpty().withMessage('Subject is required'),
   body('type')
     .trim()
-    .isIn(['internal', 'assignment', 'semester'])
-    .withMessage('Type must be internal, assignment, or semester'),
+    .isIn(['ut1', 'ut2', 'cat1', 'cat2', 'semester', 'internal', 'assignment'])
+    .withMessage('Type must be ut1, ut2, cat1, cat2, semester, internal, or assignment'),
   body('maxMarks')
     .isFloat({ min: 0.1 })
     .withMessage('maxMarks must be a positive number greater than 0'),
@@ -60,8 +60,8 @@ const validateUpdateAssessment = [
   body('type')
     .optional()
     .trim()
-    .isIn(['internal', 'assignment', 'semester'])
-    .withMessage('Type must be internal, assignment, or semester'),
+    .isIn(['ut1', 'ut2', 'cat1', 'cat2', 'semester', 'internal', 'assignment'])
+    .withMessage('Type must be ut1, ut2, cat1, cat2, semester, internal, or assignment'),
   body('maxMarks')
     .optional()
     .isFloat({ min: 0.1 })

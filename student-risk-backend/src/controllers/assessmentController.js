@@ -121,9 +121,13 @@ const getAssessmentStats = async (req, res, next) => {
           averageMarks: 0,
           marksRange: { min: 0, max: 0 },
           byType: {
+            ut1: { count: 0, average: 0 },
+            ut2: { count: 0, average: 0 },
+            cat1: { count: 0, average: 0 },
+            cat2: { count: 0, average: 0 },
+            semester: { count: 0, average: 0 },
             internal: { count: 0, average: 0 },
-            assignment: { count: 0, average: 0 },
-            semester: { count: 0, average: 0 }
+            assignment: { count: 0, average: 0 }
           }
         }
       });
@@ -153,9 +157,13 @@ const getAssessmentStats = async (req, res, next) => {
         averageMarks,
         marksRange: { min: minMarks, max: maxMarksVal },
         byType: {
+          ut1: computeTypeStats('ut1'),
+          ut2: computeTypeStats('ut2'),
+          cat1: computeTypeStats('cat1'),
+          cat2: computeTypeStats('cat2'),
+          semester: computeTypeStats('semester'),
           internal: computeTypeStats('internal'),
-          assignment: computeTypeStats('assignment'),
-          semester: computeTypeStats('semester')
+          assignment: computeTypeStats('assignment')
         }
       }
     });

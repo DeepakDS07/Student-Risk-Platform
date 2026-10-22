@@ -16,8 +16,8 @@ const assessmentSchema = new mongoose.Schema(
     type: {
       type: String,
       enum: {
-        values: ['internal', 'assignment', 'semester'],
-        message: 'Assessment type must be internal, assignment, or semester'
+        values: ['ut1', 'ut2', 'cat1', 'cat2', 'semester', 'internal', 'assignment'],
+        message: 'Assessment type must be ut1, ut2, cat1, cat2, semester, internal, or assignment'
       },
       required: [true, 'Assessment type is required']
     },
