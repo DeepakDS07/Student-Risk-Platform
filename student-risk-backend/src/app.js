@@ -12,8 +12,29 @@ const errorMiddleware = require('./middleware/errorMiddleware');
 
 const app = express();
 
-// Middlewares
-app.use(cors());
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like curl, mobile, Postman)
+    if (!origin) return callback(null, true);
+    
+    // If CLIENT_URL is specified, check against it or local dev origins
+    if (process.env.CLIENT_URL) {
+      const allowed = [
+        process.env.CLIENT_URL.replace(/\/$/, ''),
+        'http://localhost:5173',
+        'http://localhost:3000'
+      ];
+      if (allowed.includes(origin) || allowed.includes(origin.replace(/\/$/, ''))) {
+        return callback(null, true);
+      }
+    }
+    // Fallback allows origin while enabling credentials
+    return callback(null, true);
+  },
+  credentials: true
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
